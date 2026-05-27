@@ -44,6 +44,10 @@ jobs:
 
       - run: npm ci
 
+      - name: Install app deps for renderer's transitive resolution
+        working-directory: excalidrawclone
+        run: npm ci --ignore-scripts
+
       - name: Typecheck
         run: npm run typecheck
 

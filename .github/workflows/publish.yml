@@ -56,6 +56,14 @@ jobs:
 
       - run: npm ci
 
+      # Install the app repo's deps too so the renderer's `roughjs` import
+      # resolves: Node follows symlinks and looks up from the real path
+      # (excalidrawclone/packages/renderer), not from the symlinked
+      # node_modules under scribbly-libraries.
+      - name: Install app deps for renderer's transitive resolution
+        working-directory: excalidrawclone
+        run: npm ci --ignore-scripts
+
       - name: Typecheck
         run: npm run typecheck
 
