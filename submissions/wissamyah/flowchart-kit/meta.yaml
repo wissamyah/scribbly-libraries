@@ -2,8 +2,8 @@ name: Flowchart kit
 description: Building blocks for flowcharts — start, decision, process, end nodes, and a labeled connector arrow.
 version: 1.0.0
 author:
-  handle: scribbly
-  displayName: Scribbly
+  handle: wissamyah
+  displayName: Wissam Y.
 license: MIT
 tags:
   - flowcharts

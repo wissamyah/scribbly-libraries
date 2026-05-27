@@ -2,8 +2,8 @@ name: Basic shapes
 description: Common labeled shapes for diagrams — rectangle, ellipse, diamond, hexagon, and triangle, each with bound text.
 version: 1.0.0
 author:
-  handle: scribbly
-  displayName: Scribbly
+  handle: wissamyah
+  displayName: Wissam Y.
 license: MIT
 tags:
   - shapes

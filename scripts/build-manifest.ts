@@ -283,7 +283,7 @@ function indexHtml(manifest: Manifest): string {
 <body>
   <h1>Scribbly Libraries</h1>
   <p>Community-curated library packs for <a href="https://scribbly.app">Scribbly</a>.</p>
-  <p>The in-app gallery reads <a href="./libraries.json"><code>libraries.json</code></a>. Submissions are reviewed via PR in <a href="https://github.com/scribbly/scribbly-libraries">scribbly/scribbly-libraries</a>.</p>
+  <p>The in-app gallery reads <a href="./libraries.json"><code>libraries.json</code></a>. Submissions are reviewed via PR in <a href="https://github.com/wissamyah/scribbly-libraries">wissamyah/scribbly-libraries</a>.</p>
   <h2>${manifest.libraries.length} libraries</h2>
   <ul>
       ${entries || "<li>(none yet)</li>"}

@@ -52,16 +52,20 @@ jobs:
       - name: Validate every submission
         run: npm run validate
 
+      - uses: actions/configure-pages@v5
+        id: pages
+
       # @napi-rs/canvas ships prebuilt Skia binaries; no apt deps required.
+      # Base URL comes from configure-pages so the manifest's preview/
+      # download links match wherever the site actually deploys (custom
+      # domain or default <owner>.github.io/<repo>).
       - name: Build manifest + render previews
-        run: npx tsx scripts/build-manifest.ts
+        run: npx tsx scripts/build-manifest.ts --base-url "${{ steps.pages.outputs.base_url }}"
         env:
           # build-manifest exits non-zero if any submission is skipped at
           # publish time (defensive — validate.ts already gates PRs). Treat
           # that as a CI failure rather than shipping a partial manifest.
           NODE_ENV: production
-
-      - uses: actions/configure-pages@v5
 
       - uses: actions/upload-pages-artifact@v3
         with:
