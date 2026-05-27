@@ -1,8 +1,8 @@
-name: 3DShapes
-description: "# TODO: 20–280 chars describing what's in this library"
+name: 3D Shapes
+description: A small set of hand-drawn 3D primitives — cubes, prisms, and other solids you can drop onto a canvas for diagrams.
 version: 1.0.0
 author:
   handle: wissamyah
-license: # TODO: pick one of MIT, Apache-2.0, CC0-1.0, CC-BY-4.0, CC-BY-SA-4.0
+license: MIT
 tags:
-  # TODO: 1–8 tags from the controlled vocabulary in schemas/meta.schema.json
+  - diagrams
