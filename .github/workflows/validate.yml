@@ -12,6 +12,10 @@ on:
       - "package-lock.json"
       - "tsconfig.json"
 
+defaults:
+  run:
+    working-directory: scribbly-libraries
+
 jobs:
   validate:
     runs-on: ubuntu-latest
@@ -19,14 +23,24 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          path: scribbly-libraries
           # Slug-history check (when wired up) needs commit history; fetch
           # everything so `git log` can see prior submissions.
           fetch-depth: 0
+
+      # @scribbly/renderer lives in the app repo's packages/renderer/. The
+      # registry consumes it via a `file:../excalidrawclone/packages/renderer`
+      # dep, so we check the app repo out as a sibling directory.
+      - uses: actions/checkout@v4
+        with:
+          repository: wissamyah/scribbly
+          path: excalidrawclone
 
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
           cache: "npm"
+          cache-dependency-path: scribbly-libraries/package-lock.json
 
       - run: npm ci
 

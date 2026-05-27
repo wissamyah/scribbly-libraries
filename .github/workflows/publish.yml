@@ -27,6 +27,10 @@ permissions:
   pages: write
   id-token: write
 
+defaults:
+  run:
+    working-directory: scribbly-libraries
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -34,12 +38,21 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          path: scribbly-libraries
           fetch-depth: 0
+
+      # @scribbly/renderer lives in the app repo. See validate.yml for the
+      # rationale.
+      - uses: actions/checkout@v4
+        with:
+          repository: wissamyah/scribbly
+          path: excalidrawclone
 
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
           cache: "npm"
+          cache-dependency-path: scribbly-libraries/package-lock.json
 
       - run: npm ci
 
@@ -62,14 +75,11 @@ jobs:
       - name: Build manifest + render previews
         run: npx tsx scripts/build-manifest.ts --base-url "${{ steps.pages.outputs.base_url }}"
         env:
-          # build-manifest exits non-zero if any submission is skipped at
-          # publish time (defensive — validate.ts already gates PRs). Treat
-          # that as a CI failure rather than shipping a partial manifest.
           NODE_ENV: production
 
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: dist
+          path: scribbly-libraries/dist
 
   deploy:
     needs: build
