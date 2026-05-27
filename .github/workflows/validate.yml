@@ -1,0 +1,42 @@
+name: validate
+
+on:
+  pull_request:
+    paths:
+      - "submissions/**"
+      - "schemas/**"
+      - "scripts/**"
+      - "test/**"
+      - ".github/workflows/validate.yml"
+      - "package.json"
+      - "package-lock.json"
+      - "tsconfig.json"
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Slug-history check (when wired up) needs commit history; fetch
+          # everything so `git log` can see prior submissions.
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Unit tests
+        run: npm run test
+
+      - name: Validate submissions
+        run: npm run validate
+        env:
+          GITHUB_ACTOR: ${{ github.event.pull_request.user.login }}

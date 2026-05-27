@@ -1,0 +1,10 @@
+name: Sticky notes
+description: Hand-drawn sticky notes in four colors. Drop one on a canvas and replace the placeholder text.
+version: 1.0.0
+author:
+  handle: scribbly
+  displayName: Scribbly
+license: MIT
+tags:
+  - annotations
+  - presentations

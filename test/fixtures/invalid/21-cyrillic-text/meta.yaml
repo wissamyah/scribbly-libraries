@@ -1,0 +1,11 @@
+name: Server Rack
+description: Datacenter rack units, switches, and cables for infrastructure diagrams.
+version: 1.0.0
+author:
+  handle: invalid
+  displayName: Wissam Y.
+homepage: https://example.com/server-rack
+license: CC-BY-4.0
+tags:
+  - infrastructure
+  - diagrams

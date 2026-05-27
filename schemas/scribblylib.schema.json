@@ -1,0 +1,223 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://libraries.scribbly.app/schemas/scribblylib.v1.json",
+  "title": "Scribbly Library File (.scribblylib) v1",
+  "description": "Submission-side schema for .scribblylib files. Enforces invariants that are cheap to check statically; cross-element checks (group/binding integrity, self-containedness) are enforced by validate.ts in the registry repo, not by this schema.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["type", "version", "source", "libraryItems"],
+  "properties": {
+    "type": {
+      "const": "scribblylib"
+    },
+    "version": {
+      "const": 1
+    },
+    "source": {
+      "type": "string",
+      "format": "uri",
+      "maxLength": 2048
+    },
+    "libraryItems": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 200,
+      "items": { "$ref": "#/$defs/libraryItem" }
+    }
+  },
+  "$defs": {
+    "libraryItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name", "elements", "createdAt"],
+      "properties": {
+        "id": { "$ref": "#/$defs/uuid" },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "elements": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 500,
+          "items": { "$ref": "#/$defs/element" }
+        },
+        "preview": {
+          "type": "string",
+          "pattern": "^data:image/(png|webp);base64,",
+          "maxLength": 524288
+        },
+        "createdAt": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "element": {
+      "type": "object",
+      "required": [
+        "id",
+        "type",
+        "x",
+        "y",
+        "width",
+        "height",
+        "angle",
+        "strokeColor",
+        "backgroundColor",
+        "fillStyle",
+        "strokeWidth",
+        "strokeStyle",
+        "roughness",
+        "opacity",
+        "seed",
+        "version",
+        "isDeleted",
+        "isLocked",
+        "zIndex"
+      ],
+      "properties": {
+        "id": { "$ref": "#/$defs/uuid" },
+        "type": {
+          "enum": ["rectangle", "ellipse", "line", "arrow", "text", "freedraw", "frame"]
+        },
+        "roomId": { "type": "string" },
+        "x": { "type": "number" },
+        "y": { "type": "number" },
+        "width": { "type": "number", "minimum": 0 },
+        "height": { "type": "number", "minimum": 0 },
+        "angle": { "type": "number" },
+        "strokeColor": { "type": "string", "maxLength": 32 },
+        "backgroundColor": { "type": "string", "maxLength": 32 },
+        "fillStyle": { "enum": ["hachure", "cross-hatch", "solid", "none"] },
+        "strokeWidth": { "type": "number", "minimum": 0 },
+        "strokeStyle": { "enum": ["solid", "dashed", "dotted"] },
+        "roughness": { "type": "number", "minimum": 0 },
+        "opacity": { "type": "number", "minimum": 0, "maximum": 1 },
+        "seed": { "type": "integer" },
+        "version": { "type": "integer", "minimum": 0 },
+        "isDeleted": { "const": false },
+        "isLocked": { "type": "boolean" },
+        "zIndex": { "type": "number" },
+        "groupId": { "type": ["string", "null"] },
+        "frameId": { "type": ["string", "null"] },
+        "points": {
+          "type": "array",
+          "maxItems": 5000,
+          "items": {
+            "type": "array",
+            "prefixItems": [{ "type": "number" }, { "type": "number" }],
+            "minItems": 2,
+            "maxItems": 2
+          }
+        },
+        "text": { "type": "string", "maxLength": 4000 },
+        "fontSize": { "type": "number", "minimum": 1 },
+        "fontFamily": { "type": "string", "maxLength": 64 },
+        "fontColor": { "type": "string", "maxLength": 32 },
+        "textAlign": { "enum": ["left", "center", "right"] },
+        "verticalAlign": { "enum": ["top", "middle", "bottom"] },
+        "containerId": { "type": ["string", "null"] },
+        "bendPoint": {
+          "anyOf": [
+            { "type": "null" },
+            {
+              "type": "array",
+              "prefixItems": [{ "type": "number" }, { "type": "number" }],
+              "minItems": 2,
+              "maxItems": 2
+            }
+          ]
+        },
+        "startBinding": { "$ref": "#/$defs/binding" },
+        "endBinding": { "$ref": "#/$defs/binding" },
+        "startArrowhead": { "$ref": "#/$defs/arrowhead" },
+        "endArrowhead": { "$ref": "#/$defs/arrowhead" },
+        "cornerRadius": { "type": "number", "minimum": 0 },
+        "name": { "type": ["string", "null"], "maxLength": 80 },
+        "dataUrl": {
+          "type": "string",
+          "description": "Image elements are not allowed in marketplace submissions — validate.ts rejects them. Field intentionally schema-allowed for round-trip parsing only.",
+          "maxLength": 1
+        }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "type": { "const": "rectangle" } } },
+          "then": { "required": ["cornerRadius"] }
+        },
+        {
+          "if": { "properties": { "type": { "enum": ["line", "freedraw"] } } },
+          "then": { "required": ["points"] }
+        },
+        {
+          "if": { "properties": { "type": { "const": "arrow" } } },
+          "then": {
+            "required": [
+              "points",
+              "bendPoint",
+              "startBinding",
+              "endBinding",
+              "startArrowhead",
+              "endArrowhead"
+            ]
+          }
+        },
+        {
+          "if": { "properties": { "type": { "const": "text" } } },
+          "then": {
+            "required": [
+              "text",
+              "fontSize",
+              "fontFamily",
+              "fontColor",
+              "textAlign",
+              "verticalAlign",
+              "containerId"
+            ]
+          }
+        },
+        {
+          "if": { "properties": { "type": { "const": "frame" } } },
+          "then": { "required": ["name"] }
+        },
+        {
+          "if": { "properties": { "type": { "const": "image" } } },
+          "then": false
+        }
+      ]
+    },
+    "binding": {
+      "anyOf": [
+        { "type": "null" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["elementId", "focus"],
+          "properties": {
+            "elementId": { "type": "string" },
+            "focus": {
+              "anyOf": [
+                { "type": "null" },
+                {
+                  "type": "array",
+                  "prefixItems": [{ "type": "number" }, { "type": "number" }],
+                  "minItems": 2,
+                  "maxItems": 2
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "arrowhead": {
+      "enum": ["arrow", "triangle", "diamond", "dot", "bar", "none"]
+    },
+    "uuid": {
+      "type": "string",
+      "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+    }
+  }
+}

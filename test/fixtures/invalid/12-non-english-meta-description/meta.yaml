@@ -1,0 +1,11 @@
+name: Server Rack
+description: 数据中心机架、交换机、电缆，适用于基础设施图表。数据中心机架与电缆。
+version: 1.0.0
+author:
+  handle: invalid
+  displayName: Wissam Y.
+homepage: https://example.com/server-rack
+license: CC-BY-4.0
+tags:
+  - infrastructure
+  - diagrams

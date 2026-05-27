@@ -1,0 +1,107 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://libraries.scribbly.app/schemas/meta.v1.json",
+  "title": "Scribbly Library Submission Metadata (meta.yaml) v1",
+  "description": "Author-supplied metadata that accompanies a .scribblylib submission. Sits alongside library.scribblylib in submissions/<github-handle>/<library-slug>/. Validated in CI by validate.ts.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["name", "description", "version", "author", "license", "tags"],
+  "properties": {
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 60,
+      "description": "Human-readable library name. English only."
+    },
+    "description": {
+      "type": "string",
+      "minLength": 20,
+      "maxLength": 280,
+      "description": "One or two sentence summary of what the library contains and who it is for. English only."
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)$",
+      "description": "Strict semver MAJOR.MINOR.PATCH. Must increase on every published update to the same slug."
+    },
+    "author": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["handle"],
+      "properties": {
+        "handle": {
+          "type": "string",
+          "pattern": "^[a-z0-9](?:[a-z0-9-]{0,38})$",
+          "description": "GitHub handle of the submitter. Lowercased; must match the directory name under submissions/."
+        },
+        "displayName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 60
+        }
+      }
+    },
+    "homepage": {
+      "type": "string",
+      "format": "uri",
+      "maxLength": 2048
+    },
+    "license": {
+      "enum": [
+        "MIT",
+        "Apache-2.0",
+        "CC0-1.0",
+        "CC-BY-4.0",
+        "CC-BY-SA-4.0"
+      ],
+      "description": "SPDX identifier. Restricted to the marketplace allowlist."
+    },
+    "tags": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 8,
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "ui",
+          "icons",
+          "diagrams",
+          "flowcharts",
+          "mindmaps",
+          "charts",
+          "infrastructure",
+          "software-architecture",
+          "web-design",
+          "education",
+          "business",
+          "presentations",
+          "wireframes",
+          "data-modeling",
+          "annotations",
+          "shapes",
+          "miscellaneous"
+        ]
+      },
+      "description": "Controlled tag vocabulary. Adding a new tag requires a separate PR that updates this schema and CONTRIBUTING.md."
+    },
+    "previewItemId": {
+      "$ref": "#/$defs/uuid",
+      "description": "Optional. The id of the libraryItem to render as the gallery card thumbnail. Defaults to the first item when omitted."
+    },
+    "deprecated": {
+      "type": "boolean",
+      "default": false,
+      "description": "Marks the library as superseded. Gallery hides deprecated libraries from default browse but keeps them installable by direct link."
+    },
+    "deprecationNote": {
+      "type": "string",
+      "maxLength": 280
+    }
+  },
+  "$defs": {
+    "uuid": {
+      "type": "string",
+      "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+    }
+  }
+}

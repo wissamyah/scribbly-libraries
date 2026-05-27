@@ -1,0 +1,98 @@
+{
+  "type": "scribblylib",
+  "version": 1,
+  "source": "https://scribbly.app",
+  "libraryItems": [
+    {
+      "id": "11111111-1111-4111-8111-111111111111",
+      "name": "Rack unit",
+      "createdAt": 1700000000000,
+      "elements": [
+        {
+          "id": "22222222-2222-4222-8222-222222222222",
+          "type": "rectangle",
+          "x": 0, "y": 0, "width": 200, "height": 40, "angle": 0,
+          "strokeColor": "#1e1e1e", "backgroundColor": "transparent",
+          "fillStyle": "hachure", "strokeWidth": 2, "strokeStyle": "solid",
+          "roughness": 1, "opacity": 1,
+          "seed": 12345, "version": 0, "isDeleted": true, "isLocked": false, "zIndex": 0,
+          "groupId": null, "frameId": null,
+          "cornerRadius": 4
+        },
+        {
+          "id": "33333333-3333-4333-8333-333333333333",
+          "type": "text",
+          "x": 8, "y": 10, "width": 184, "height": 20, "angle": 0,
+          "strokeColor": "#1e1e1e", "backgroundColor": "transparent",
+          "fillStyle": "none", "strokeWidth": 1, "strokeStyle": "solid",
+          "roughness": 0, "opacity": 1,
+          "seed": 23456, "version": 0, "isDeleted": false, "isLocked": false, "zIndex": 1,
+          "groupId": null, "frameId": null,
+          "text": "Server",
+          "fontSize": 20,
+          "fontFamily": "Virgil",
+          "fontColor": "#1e1e1e",
+          "textAlign": "center",
+          "verticalAlign": "middle",
+          "containerId": "22222222-2222-4222-8222-222222222222"
+        }
+      ]
+    },
+    {
+      "id": "44444444-4444-4444-8444-444444444444",
+      "name": "Switch with link",
+      "createdAt": 1700000000000,
+      "elements": [
+        {
+          "id": "55555555-5555-4555-8555-555555555555",
+          "type": "rectangle",
+          "x": 0, "y": 60, "width": 200, "height": 40, "angle": 0,
+          "strokeColor": "#1e1e1e", "backgroundColor": "#a5d8ff",
+          "fillStyle": "solid", "strokeWidth": 2, "strokeStyle": "solid",
+          "roughness": 1, "opacity": 1,
+          "seed": 34567, "version": 0, "isDeleted": false, "isLocked": false, "zIndex": 0,
+          "groupId": null, "frameId": null,
+          "cornerRadius": 0
+        },
+        {
+          "id": "66666666-6666-4666-8666-666666666666",
+          "type": "arrow",
+          "x": 220, "y": 80, "width": 80, "height": 0, "angle": 0,
+          "strokeColor": "#1e1e1e", "backgroundColor": "transparent",
+          "fillStyle": "none", "strokeWidth": 2, "strokeStyle": "solid",
+          "roughness": 1, "opacity": 1,
+          "seed": 45678, "version": 0, "isDeleted": false, "isLocked": false, "zIndex": 1,
+          "groupId": null, "frameId": null,
+          "points": [[220, 80], [300, 80]],
+          "bendPoint": null,
+          "startBinding": { "elementId": "55555555-5555-4555-8555-555555555555", "focus": [1, 0] },
+          "endBinding": null,
+          "startArrowhead": "none",
+          "endArrowhead": "arrow"
+        }
+      ]
+    },
+    {
+      "id": "88888888-8888-4888-8888-888888888888",
+      "name": "Cable run",
+      "createdAt": 1700000000000,
+      "elements": [
+        {
+          "id": "99999999-9999-4999-8999-999999999999",
+          "type": "freedraw",
+          "x": 0, "y": 120, "width": 240, "height": 40, "angle": 0,
+          "strokeColor": "#1e1e1e", "backgroundColor": "transparent",
+          "fillStyle": "none", "strokeWidth": 2, "strokeStyle": "solid",
+          "roughness": 1, "opacity": 1,
+          "seed": 56789, "version": 0, "isDeleted": false, "isLocked": false, "zIndex": 0,
+          "groupId": null, "frameId": null,
+          "points": [
+            [0, 140], [20, 130], [40, 145], [60, 135], [80, 150],
+            [100, 138], [120, 152], [140, 140], [160, 155], [180, 142],
+            [200, 156], [220, 144], [240, 158]
+          ]
+        }
+      ]
+    }
+  ]
+}
