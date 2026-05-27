@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Report a library
+    url: https://github.com/wissamyah/scribbly-libraries/issues/new?labels=report&template=
+    about: Found a library with wrong content, attribution issues, or that breaks on install? Open a regular issue with the "report" label.
+  - name: Documentation
+    url: https://github.com/wissamyah/scribbly-libraries/blob/main/CONTRIBUTING.md
+    about: Read CONTRIBUTING.md — content rules, licensing, and the publishing pipeline.

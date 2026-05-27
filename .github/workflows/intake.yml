@@ -1,0 +1,159 @@
+name: intake
+
+# Fires when a submission issue (Issue Form: submit-library.yml) opens or
+# when the submitter comments /retry after fixing a problem. The job
+# scaffolds the submission folder and opens a PR. The maintainer just
+# clicks Merge — no clone, no terminal, no meta.yaml edits.
+#
+# Permissions:
+#   contents: write   — push a branch with the new submission files.
+#   issues:  write    — comment on the issue with status updates.
+#   pull-requests: write — open the PR.
+
+on:
+  issues:
+    types: [opened, edited]
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+concurrency:
+  # Serialize per-issue so two simultaneous edits don't both try to create
+  # the same branch.
+  group: intake-${{ github.event.issue.number }}
+  cancel-in-progress: false
+
+defaults:
+  run:
+    working-directory: scribbly-libraries
+
+jobs:
+  open-pr:
+    # Skip unless: (a) the issue carries the `submission` label set by the
+    # Issue Form, AND (b) for comment events, the comment is `/retry` from
+    # the original submitter (anyone else commenting `/retry` is ignored).
+    if: >
+      contains(github.event.issue.labels.*.name, 'submission')
+      && (
+        github.event_name == 'issues'
+        || (
+          github.event_name == 'issue_comment'
+          && github.event.comment.body == '/retry'
+          && github.event.comment.user.login == github.event.issue.user.login
+        )
+      )
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: scribbly-libraries
+          # Need full history so we can create + push the new branch
+          # without a shallow-clone push reject.
+          fetch-depth: 0
+          # Default GITHUB_TOKEN is fine — we already grant contents/PR
+          # write above. No PAT needed since the same repo's actions can
+          # open PRs against itself.
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: scribbly-libraries/package-lock.json
+
+      # Only install the minimal deps the intake script needs (tsx, yaml).
+      # We skip the full `npm ci` to keep this job fast — validation runs
+      # later on the PR via validate.yml.
+      - name: Install deps
+        run: npm ci --ignore-scripts
+
+      - name: Configure git identity
+        run: |
+          git config user.name  "scribbly-libraries-bot"
+          git config user.email "bot@scribbly.app"
+
+      - name: Run intake
+        id: intake
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # intake.ts prints `{handle, slug, branch, slugDir}` to stdout on
+          # success; on submitter error it comments on the issue and exits
+          # with code 2 (which we treat as a soft-fail — workflow ends
+          # gracefully without opening a PR).
+          set +e
+          output=$(npx tsx scripts/intake.ts ${{ github.event.issue.number }})
+          status=$?
+          set -e
+          if [ "$status" -eq 2 ]; then
+            echo "Submitter error — comment posted on issue. Skipping PR."
+            exit 0
+          fi
+          if [ "$status" -ne 0 ]; then
+            echo "Intake failed (exit $status)"
+            exit "$status"
+          fi
+          echo "$output"
+          handle=$(echo "$output" | node -e 'let s="";process.stdin.on("data",c=>s+=c).on("end",()=>process.stdout.write(JSON.parse(s).handle))')
+          slug=$(echo "$output" | node -e 'let s="";process.stdin.on("data",c=>s+=c).on("end",()=>process.stdout.write(JSON.parse(s).slug))')
+          branch=$(echo "$output" | node -e 'let s="";process.stdin.on("data",c=>s+=c).on("end",()=>process.stdout.write(JSON.parse(s).branch))')
+          echo "handle=$handle" >> "$GITHUB_OUTPUT"
+          echo "slug=$slug" >> "$GITHUB_OUTPUT"
+          echo "branch=$branch" >> "$GITHUB_OUTPUT"
+          echo "scaffolded=true" >> "$GITHUB_OUTPUT"
+
+      - name: Commit + push branch
+        if: steps.intake.outputs.scaffolded == 'true'
+        env:
+          BRANCH: ${{ steps.intake.outputs.branch }}
+          HANDLE: ${{ steps.intake.outputs.handle }}
+          SLUG: ${{ steps.intake.outputs.slug }}
+          ISSUE: ${{ github.event.issue.number }}
+        run: |
+          # If a stale branch exists (e.g. previous failed run), delete and
+          # recreate so the PR is always for the current intake's content.
+          git push origin --delete "$BRANCH" || true
+          git checkout -b "$BRANCH"
+          git add "submissions/$HANDLE/$SLUG"
+          git commit -m "Add $HANDLE/$SLUG (from #$ISSUE)"
+          git push -u origin "$BRANCH"
+
+      - name: Open PR
+        if: steps.intake.outputs.scaffolded == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH: ${{ steps.intake.outputs.branch }}
+          HANDLE: ${{ steps.intake.outputs.handle }}
+          SLUG: ${{ steps.intake.outputs.slug }}
+          ISSUE: ${{ github.event.issue.number }}
+        run: |
+          # If a PR already exists for this branch (e.g. the submitter
+          # /retry'd), just leave a comment pointing at it instead of
+          # erroring on duplicate PR.
+          existing=$(gh pr list --head "$BRANCH" --json number --jq '.[0].number')
+          if [ -n "$existing" ]; then
+            gh issue comment "$ISSUE" --body "Re-opened branch for #$existing with your latest fields."
+            exit 0
+          fi
+          gh pr create \
+            --title "Add $HANDLE/$SLUG" \
+            --body "Imports submission from #$ISSUE. Validation runs on this PR; once it's green, a maintainer will merge.\n\nCloses #$ISSUE." \
+            --head "$BRANCH"
+
+      - name: Comment on issue with PR link
+        if: steps.intake.outputs.scaffolded == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH: ${{ steps.intake.outputs.branch }}
+          ISSUE: ${{ github.event.issue.number }}
+        run: |
+          pr=$(gh pr list --head "$BRANCH" --json number,url --jq '.[0]')
+          if [ -n "$pr" ]; then
+            url=$(echo "$pr" | node -e 'let s="";process.stdin.on("data",c=>s+=c).on("end",()=>process.stdout.write(JSON.parse(s).url))')
+            gh issue comment "$ISSUE" --body "Thanks! Opened $url. A maintainer will review and merge."
+          fi

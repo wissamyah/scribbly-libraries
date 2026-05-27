@@ -16,7 +16,31 @@ Scribbly's in-app **Browse** tab reads `libraries.json` directly from that URL. 
 4. Open a PR. CI will validate. Fix anything CI complains about.
 5. A maintainer reviews against the content guidelines. Once merged, your library appears in the gallery on the next publish run.
 
-There is no upload UI inside Scribbly itself. **Friction is the feature** — it's what keeps an unauthenticated app from drowning in spam.
+Non-developers submit via Scribbly's in-app **Submit to gallery** button, which opens a structured [Issue Form](.github/ISSUE_TEMPLATE/submit-library.yml). When the issue is created, a GitHub Action ([`intake.yml`](.github/workflows/intake.yml)) auto-scaffolds the folder, opens a PR, and comments back with the PR link. The submitter waits, the maintainer reviews + merges.
+
+## Reviewing submissions (maintainer flow)
+
+Day-to-day, you should only ever need to do one thing:
+
+1. A submission issue lands → the bot opens a PR → CI runs `validate.yml`.
+2. Open the PR on github.com. Skim the diff: `meta.yaml` for sanity, `library.scribblylib` exists.
+3. (Optional) Verify by hand: `gh pr checkout <n>` then `npm run validate -- submissions/<handle>/<slug>` locally. Or import the file into Scribbly to preview visually.
+4. **Merge.** `publish.yml` regenerates `libraries.json` and ships it.
+5. Close the source issue (the PR's `Closes #N` auto-closes it on merge).
+
+If the submitter made a mistake (bad slug, missing file, attachment isn't valid JSON), the bot comments on the issue with what's wrong and doesn't open a PR. The submitter edits the issue or comments `/retry`, and the bot tries again.
+
+### Legacy / fallback: `npm run review`
+
+For older free-form issues (pre-Issue-Form), or when the bot can't help, scaffold by hand:
+
+```bash
+npm run review -- <issue-number>            # scaffold + validate locally
+npm run review -- <issue-number> --auto-pr  # also create branch + open PR
+npm run review -- <issue-number> --force    # overwrite an existing slug dir
+```
+
+This is the manual escape hatch — under the bot-driven flow you shouldn't reach for it.
 
 ## Removal
 

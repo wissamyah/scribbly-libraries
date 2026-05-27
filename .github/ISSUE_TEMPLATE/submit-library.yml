@@ -1,0 +1,104 @@
+name: Submit a library
+description: Share a `.scribblylib.json` library with the Scribbly community.
+title: "Submit: <library name>"
+labels: ["submission"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for sharing! When you submit this form, a bot opens a draft PR with your
+        files. A maintainer reviews it and merges. **No need to fork or run any commands.**
+
+        Before you start, you need a `.scribblylib.json` file. Get one from Scribbly:
+        Library panel → *Submit to gallery* → *Download .scribblylib.json*.
+
+  - type: input
+    id: name
+    attributes:
+      label: Library name
+      description: How the library appears in the gallery. Plain English, 1–60 characters.
+      placeholder: "3D Shapes"
+    validations:
+      required: true
+
+  - type: input
+    id: slug
+    attributes:
+      label: Slug
+      description: |
+        Lowercase, kebab-case identifier — used in URLs and as the directory name.
+        Must match `^[a-z0-9](?:[a-z0-9-]{0,62})$`. Stays the same forever; bump the
+        version field in future PRs instead of changing the slug.
+      placeholder: "3d-shapes"
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: 1–2 sentences describing what's in the library and who it's for. 20–280 characters, English.
+      placeholder: "A small set of hand-drawn 3D primitives — cubes, prisms, and other solids you can drop onto a canvas for diagrams."
+    validations:
+      required: true
+
+  - type: dropdown
+    id: license
+    attributes:
+      label: License
+      description: |
+        SPDX identifier. Read the [license summary](https://choosealicense.com/) if you're not sure.
+        **MIT** is a safe default for original work; **CC0-1.0** is "public domain."
+      options:
+        - MIT
+        - Apache-2.0
+        - CC0-1.0
+        - CC-BY-4.0
+        - CC-BY-SA-4.0
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: tags
+    attributes:
+      label: Tags
+      description: Pick 1–8 that fit. Used for filtering in the Browse tab.
+      options:
+        - label: ui
+        - label: icons
+        - label: diagrams
+        - label: flowcharts
+        - label: mindmaps
+        - label: charts
+        - label: infrastructure
+        - label: software-architecture
+        - label: web-design
+        - label: education
+        - label: annotations
+        - label: presentations
+    validations:
+      required: true
+
+  - type: textarea
+    id: library_file
+    attributes:
+      label: Library file
+      description: |
+        **Drag your `.scribblylib.json` file directly into this box.** GitHub will
+        upload it and insert a link automatically. Without the file, the bot can't
+        create your PR.
+      placeholder: "Drop your .scribblylib.json file here."
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: confirmations
+    attributes:
+      label: Confirmations
+      options:
+        - label: This library is original work, or a remix I have permission to publish under the declared license.
+          required: true
+        - label: All in-library text is English.
+          required: true
+        - label: I understand the bot will open a PR with my submission, and a maintainer will review before publishing.
+          required: true

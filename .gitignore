@@ -3,3 +3,4 @@ dist/
 preview.png
 .DS_Store
 *.log
+*.tsbuildinfo
